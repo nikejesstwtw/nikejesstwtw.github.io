@@ -6,15 +6,13 @@
   <title>內容管理後台</title>
   <script>
     // Define the configuration as a global variable before the CMS script loads.
-    // This is a more robust initialization method that avoids race conditions.
     window.CMS_CONFIG = {
       backend: {
         name: "github",
         repo: "nikejesstwtw/nikejesstwtw.github.io", // Your GitHub repo
         branch: "main", // The branch to update
-        // Switched to PKCE auth flow, which is more secure and can resolve "invalid state key" errors.
-        auth_type: "pkce", 
-        app_id: "0v23li29mXIVSvlKtVjV" // Your GitHub OAuth App Client ID
+        // Using a public OAuth gateway. This is a simpler and more reliable method that bypasses the need for manual Netlify setup.
+        base_url: "https://netlify-cms-oauth-provider-go.netlify.app"
       },
       // The media folder and public folder are relative to the root of the repository
       media_folder: "assets/uploads",
@@ -40,10 +38,6 @@
   </script>
 </head>
 <body>
-  <!-- Decap CMS Core script. It will automatically find and use the global CMS_CONFIG variable upon loading. -->
-  <script src="https://unpkg.com/decap-cms@3.1.2/dist/decap-cms.js"></script>
-</body>
-</html>
   <!-- Decap CMS Core script. It will automatically find and use the global CMS_CONFIG variable upon loading. -->
   <script src="https://unpkg.com/decap-cms@3.1.2/dist/decap-cms.js"></script>
 </body>
