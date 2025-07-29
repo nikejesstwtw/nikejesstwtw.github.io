@@ -4,14 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>內容管理後台</title>
-</head>
-<body>
-  <!-- Decap CMS Core script -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   <script>
-    // Embed the configuration directly into the HTML to bypass file fetching issues.
-    // This is a more robust method.
-    var config = {
+    // Define the configuration as a global variable before the CMS script loads.
+    // This is a more robust initialization method that avoids race conditions.
+    window.CMS_CONFIG = {
       backend: {
         name: "github",
         repo: "nikejesstwtw/nikejesstwtw.github.io", // Your GitHub repo
@@ -40,9 +36,10 @@
         }
       ]
     };
-
-    // Initialize Decap CMS with the embedded configuration
-    window.CMS.init({ config });
   </script>
+</head>
+<body>
+  <!-- Decap CMS Core script. It will automatically find and use the global CMS_CONFIG variable upon loading. -->
+  <script src="https://unpkg.com/decap-cms@3.1.2/dist/decap-cms.js"></script>
 </body>
 </html>
