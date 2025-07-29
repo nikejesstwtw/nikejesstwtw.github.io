@@ -4,9 +4,45 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>內容管理後台</title>
-  <!-- Decap CMS Core -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </head>
 <body>
+  <!-- Decap CMS Core script -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    // Embed the configuration directly into the HTML to bypass file fetching issues.
+    // This is a more robust method.
+    var config = {
+      backend: {
+        name: "github",
+        repo: "nikejesstwtw/nikejesstwtw.github.io", // Your GitHub repo
+        branch: "main", // The branch to update
+        auth_type: "implicit",
+        app_id: "0v23li29mXIVSvlKtVjV" // Your GitHub OAuth App Client ID
+      },
+      // The media folder and public folder are relative to the root of the repository
+      media_folder: "assets/uploads",
+      public_folder: "/assets/uploads",
+      // This is where the blog posts will be stored
+      collections: [
+        {
+          name: "posts",
+          label: "文章",
+          folder: "_posts",
+          create: true,
+          slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+          fields: [
+            { label: "標題", name: "title", widget: "string" },
+            { label: "發佈日期", name: "date", widget: "datetime" },
+            { label: "分類", name: "category", widget: "select", options: ["好物推薦", "育兒生活", "生活隨筆"] },
+            { label: "特色圖片", name: "thumbnail", widget: "image", required: false },
+            { label: "內文", name: "body", widget: "markdown" }
+          ]
+        }
+      ]
+    };
+
+    // Initialize Decap CMS with the embedded configuration
+    window.CMS.init({ config });
+  </script>
 </body>
 </html>
