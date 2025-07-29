@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rena的 AI 增強版部落格</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- js-yaml.js for Frontmatter parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+    <style>
+        body { font-family: 'Inter', 'Noto Sans TC', sans-serif; }
+        .nav-link-active { color: #10B981; font-weight: 700; position: relative; }
+        .nav-link-active::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 100%; height: 2px; background-color: #10B981; }
+        .ai-generator { background-color: #f7fafc; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1.5rem; margin-top: 2rem; }
+        .ai-result-card { background-color: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem; transition: box-shadow 0.3s ease; }
+        .ai-result-card:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .post-content h1, .post-content h2, .post-content h3 { font-weight: bold; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .post-content h1 { font-size: 1.875rem; }
+        .post-content h2 { font-size: 1.5rem; }
+        .post-content h3 { font-size: 1.25rem; }
+        .post-content p { margin-bottom: 1rem; line-height: 1.75; }
+        .post-content ul { list-style: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .post-content ol { list-style: decimal; margin-left: 1.5rem; margin-bottom: 1rem; }
+        .post-content a { color: #10B981; text-decoration: underline; }
+        .post-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1.5rem 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                 <h1 class="text-2xl md:text-3xl font-bold text-gray-900 cursor-pointer" onclick="switchPage(event, 'home')">Rena的日常角落</h1>
+                 <span class="hidden sm:inline-block bg-yellow-200 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">✨ CMS+AI</span>
+            </div>
+            <nav class="hidden md:flex space-x-8 text-lg">
+                <a href="#home" onclick="switchPage(event, 'home')" class="nav-link text-gray-600 hover:text-emerald-500 transition duration-300 nav-link-active">首頁</a>
+                <a href="#recommendations" onclick="switchPage(event, 'recommendations')" class="nav-link text-gray-600 hover:text-emerald-500 transition duration-300">好物推薦</a>
+                <a href="#parenting" onclick="switchPage(event, 'parenting')" class="nav-link text-gray-600 hover:text-emerald-500 transition duration-300">育兒生活</a>
+                <a href="#life-musings" onclick="switchPage(event, 'life-musings')" class="nav-link text-gray-600 hover:text-emerald-500 transition duration-300">生活隨筆</a>
+                <a href="#about" onclick="switchPage(event, 'about')" class="nav-link text-gray-600 hover:text-emerald-500 transition duration-300">關於我</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="#home" onclick="switchPage(event, 'home', true)" class="block py-2 text-gray-600 hover:text-emerald-500">首頁</a>
+             <a href="#recommendations" onclick="switchPage(event, 'recommendations', true)" class="block py-2 text-gray-600 hover:text-emerald-500">好物推薦</a>
+             <a href="#parenting" onclick="switchPage(event, 'parenting', true)" class="block py-2 text-gray-600 hover:text-emerald-500">育兒生活</a>
+             <a href="#life-musings" onclick="switchPage(event, 'life-musings', true)" class="block py-2 text-gray-600 hover:text-emerald-500">生活隨筆</a>
+             <a href="#about" onclick="switchPage(event, 'about', true)" class="block py-2 text-gray-600 hover:text-emerald-500">關於我</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <!-- Home Page -->
+        <div id="page-home" class="page-content">
+            <section class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">分享生活，記錄美好</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">歡迎來到我的小天地！現在網站已經有後台管理功能，寫文章變得更方便了！</p>
+            </section>
+            <section>
+                <h3 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-emerald-500 pl-4">最新文章</h3>
+                <div id="latest-posts-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- 最新文章將由 JS 動態載入 -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Category Pages -->
+        <div id="page-recommendations" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-sky-500 pl-4">好物推薦</h2>
+            <div id="posts-container-recommendations" class="space-y-8"></div>
+            <div id="ai-generator-recommendations" class="ai-generator"></div>
+        </div>
+        <div id="page-parenting" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-pink-500 pl-4">育兒生活</h2>
+            <div id="posts-container-parenting" class="space-y-8"></div>
+            <div id="ai-generator-parenting" class="ai-generator"></div>
+        </div>
+        <div id="page-life-musings" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-red-500 pl-4">生活隨筆</h2>
+            <div id="posts-container-life-musings" class="space-y-8"></div>
+            <div id="ai-generator-life-musings" class="ai-generator"></div>
+        </div>
+
+        <!-- Post Detail Page -->
+        <div id="page-post-detail" class="page-content hidden">
+            <!-- 文章內容將由 JS 動態載入 -->
+        </div>
+        
+        <!-- About Page -->
+        <div id="page-about" class="page-content hidden">
+            <h2 class="text-3xl font-bold text-gray-900 mb-8 border-l-4 border-purple-500 pl-4">關於我</h2>
+            <div class="bg-white rounded-lg shadow-md p-8 flex flex-col md:flex-row items-center gap-8">
+                <img src="https://placehold.co/300x300/e9d5ff/333333?text=Rena" alt="Rena的照片" class="w-48 h-48 rounded-full object-cover shadow-lg">
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-bold text-gray-900">嗨，我是Rena！</h3>
+                    <p class="mt-4 text-lg text-gray-600">一個熱愛分享生活點滴的媽媽，也是個永遠對世界充滿好奇心的探索者...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2024 Rena的日常角落. All Rights Reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">Website template designed with ❤️ and powered by CMS & AI.</p>
+        </div>
+    </footer>
+    
+    <button id="back-to-top" class="hidden fixed bottom-8 right-8 bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-full shadow-lg transition-opacity duration-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    </button>
+
+    <script>
+        // --- CONFIGURATION ---
+        const GITHUB_USERNAME = 'nikejesstwtw'; // 請換成您的 GitHub 帳號
+        const GITHUB_REPO = 'nikejesstwtw.github.io'; // 請換成您的倉庫名稱
+
+        // --- GLOBAL STATE ---
+        let allPosts = [];
+
+        // --- PAGE NAVIGATION ---
+        const pages = document.querySelectorAll('.page-content');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function showPage(pageId, postData = null) {
+            pages.forEach(page => page.classList.add('hidden'));
+            const activePage = document.getElementById(`page-${pageId}`);
+            if (activePage) {
+                if (pageId === 'post-detail' && postData) {
+                    renderPostDetail(postData);
+                }
+                activePage.classList.remove('hidden');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function updateActiveLink(targetLink) {
+            navLinks.forEach(link => link.classList.remove('nav-link-active'));
+            if(targetLink) targetLink.classList.add('nav-link-active');
+        }
+
+        function switchPage(event, pageId, isMobile = false) {
+            event.preventDefault();
+            showPage(pageId);
+            const desktopLink = document.querySelector(`nav.hidden a[href="#${pageId}"]`);
+            updateActiveLink(desktopLink);
+            if(isMobile) document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // --- DATA FETCHING & PARSING ---
+        async function fetchPosts() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/_posts`);
+                if (!response.ok) throw new Error('無法從 GitHub 讀取文章列表');
+                const files = await response.json();
+                
+                const postPromises = files
+                    .filter(file => file.name.endsWith('.md'))
+                    .map(async file => {
+                        const postResponse = await fetch(file.download_url);
+                        const postContent = await postResponse.text();
+                        return parsePost(postContent, file.name);
+                    });
+
+                allPosts = await Promise.all(postPromises);
+                allPosts.sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by date descending
+                
+                renderAllPosts();
+            } catch (error) {
+                console.error('讀取文章時發生錯誤:', error);
+                document.getElementById('latest-posts-container').innerHTML = `<p class="text-red-500">讀取文章失敗。請確認您的倉庫是公開的，且 _posts 資料夾內有文章。</p>`;
+            }
+        }
+
+        function parsePost(content, fileName) {
+            const frontmatterRegex = /^---\s*([\s\S]*?)\s*---/;
+            const match = frontmatterRegex.exec(content);
+            const frontmatter = jsyaml.load(match[1]);
+            const body = content.slice(match[0].length).trim();
+            return { ...frontmatter, body, id: fileName };
+        }
+
+        // --- RENDERING ---
+        function renderAllPosts() {
+            renderLatestPosts(allPosts.slice(0, 3));
+            renderCategoryPosts('好物推薦', 'posts-container-recommendations');
+            renderCategoryPosts('育兒生活', 'posts-container-parenting');
+            renderCategoryPosts('生活隨筆', 'posts-container-life-musings');
+        }
+        
+        function renderLatestPosts(posts) {
+            const container = document.getElementById('latest-posts-container');
+            container.innerHTML = posts.map(post => createPostCard(post, 'home')).join('');
+        }
+
+        function renderCategoryPosts(category, containerId) {
+            const container = document.getElementById(containerId);
+            const categoryPosts = allPosts.filter(post => post.category === category);
+            if (categoryPosts.length > 0) {
+                 container.innerHTML = categoryPosts.map(post => createPostCard(post, 'category')).join('');
+            } else {
+                container.innerHTML = `<p class="text-gray-500">這個分類還沒有文章喔！</p>`;
+            }
+        }
+        
+        function createPostCard(post, type) {
+            const excerpt = marked.parse(post.body).replace(/<[^>]*>/g, '').substring(0, 100) + '...';
+            const imageUrl = post.thumbnail ? post.thumbnail : `https://placehold.co/600x400/a7f3d0/333333?text=${encodeURIComponent(post.title)}`;
+            
+            if (type === 'home') {
+                 return `
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer" onclick="showPage('post-detail', ${JSON.stringify(post).replace(/"/g, '&quot;')})">
+                        <img src="${imageUrl}" alt="${post.title}" class="w-full h-48 object-cover">
+                        <div class="p-6">
+                            <span class="text-sm bg-pink-100 text-pink-800 px-2 py-1 rounded-full">${post.category}</span>
+                            <h4 class="text-xl font-bold my-3">${post.title}</h4>
+                            <p class="text-gray-600 mb-4">${excerpt}</p>
+                            <span class="text-emerald-600 hover:text-emerald-800 font-semibold">繼續閱讀 &rarr;</span>
+                        </div>
+                    </div>`;
+            }
+            
+            return `
+                 <div class="bg-white rounded-lg shadow-md p-6 flex flex-col md:flex-row items-start gap-6 cursor-pointer" onclick="showPage('post-detail', ${JSON.stringify(post).replace(/"/g, '&quot;')})">
+                    <img src="${imageUrl}" alt="${post.title}" class="w-full md:w-1/3 rounded-lg object-cover">
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-2">${post.title}</h3>
+                        <p class="text-sm text-gray-500 mb-2">${new Date(post.date).toLocaleDateString()}</p>
+                        <p class="text-gray-600">${excerpt}</p>
+                    </div>
+                </div>`;
+        }
+        
+        function renderPostDetail(post) {
+            const container = document.getElementById('page-post-detail');
+            const imageUrl = post.thumbnail ? post.thumbnail : `https://placehold.co/1200x600/a7f3d0/333333?text=${encodeURIComponent(post.title)}`;
+            container.innerHTML = `
+                <article class="bg-white p-4 sm:p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                    <button onclick="switchPage(event, 'home')" class="text-emerald-600 hover:text-emerald-800 mb-6">&larr; 回到首頁</button>
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">${post.title}</h1>
+                    <div class="text-gray-500 mb-4">
+                        <span>分類：${post.category}</span> | <span>發佈於：${new Date(post.date).toLocaleDateString()}</span>
+                    </div>
+                    <img src="${imageUrl}" alt="${post.title}" class="w-full h-auto object-cover rounded-lg mb-8">
+                    <div class="prose lg:prose-xl max-w-none post-content">
+                        ${marked.parse(post.body)}
+                    </div>
+                </article>
+            `;
+        }
+
+        // --- AI FEATURE ---
+        const aiCategories = { 'recommendations': '好物推薦', 'parenting': '育兒生活', 'life-musings': '生活隨筆' };
+        function createAiGeneratorHTML(category) {
+            const categoryName = aiCategories[category];
+            return `
+                <h3 class="text-2xl font-bold text-gray-800 flex items-center mt-8"><span class="text-yellow-500 mr-2">✨</span> AI 靈感產生器</h3>
+                <p class="text-gray-600 mt-2">卡關了嗎？輸入一個關鍵字，讓 AI 幫助你發想「${categoryName}」分類的文章點子！</p>
+                <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="ai-input-${category}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="例如：嬰兒推車、親子餐廳...">
+                    <button onclick="generateIdeas('${category}')" class="bg-emerald-500 text-white font-bold px-6 py-2 rounded-md hover:bg-emerald-600 transition-colors shrink-0">產生點子</button>
+                </div>
+                <div id="ai-loading-${category}" class="hidden mt-4"><div class="loader"></div><p class="text-center text-gray-500">AI 正在努力創作中...</p></div>
+                <div id="ai-results-${category}" class="mt-4"></div>`;
+        }
+        async function generateIdeas(category) {
+            const inputElement = document.getElementById(`ai-input-${category}`);
+            const resultsElement = document.getElementById(`ai-results-${category}`);
+            const loadingElement = document.getElementById(`ai-loading-${category}`);
+            const userInput = inputElement.value.trim();
+            if (!userInput) { resultsElement.innerHTML = '<p class="text-red-500">請先輸入一個關鍵字！</p>'; return; }
+            loadingElement.classList.remove('hidden');
+            resultsElement.innerHTML = '';
+            const categoryDisplayName = aiCategories[category];
+            const prompt = `你是一位專業的中文部落客，專門撰寫關於「${categoryDisplayName}」主題的文章。請根據使用者提供的關鍵字「${userInput}」，產生3個獨特且吸引人的文章點子。請以JSON格式回傳，格式為一個包含三個物件的陣列，每個物件都應有 'title' (文章標題) 和 'outline' (一個包含多個字串的陣列，代表文章段落大綱) 這兩個鍵。`;
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: { type: "ARRAY", items: { type: "OBJECT", properties: { "title": { "type": "STRING" }, "outline": { "type": "ARRAY", "items": { "type": "STRING" } } }, "required": ["title", "outline"] } } } };
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+                const result = await response.json();
+                loadingElement.classList.add('hidden');
+                if (result.candidates && result.candidates.length > 0) {
+                    const ideas = JSON.parse(result.candidates[0].content.parts[0].text);
+                    resultsElement.innerHTML = ideas.map(idea => `
+                        <div class="ai-result-card">
+                            <h4 class="text-lg font-bold text-emerald-700">${idea.title}</h4>
+                            <ul class="list-disc list-inside mt-2 text-gray-600 space-y-1">${idea.outline.map(item => `<li>${item}</li>`).join('')}</ul>
+                        </div>`).join('');
+                } else { throw new Error('AI 未能產生有效的內容。'); }
+            } catch (error) {
+                loadingElement.classList.add('hidden');
+                resultsElement.innerHTML = `<p class="text-red-500">發生錯誤：${error.message} 請稍後再試。</p>`;
+                console.error('Error calling Gemini API:', error);
+            }
+        }
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchPosts();
+            Object.keys(aiCategories).forEach(category => {
+                const container = document.getElementById(`ai-generator-${category}`);
+                if(container) container.innerHTML = createAiGeneratorHTML(category);
+            });
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            const backToTopButton = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) backToTopButton.classList.remove('hidden');
+                else backToTopButton.classList.add('hidden');
+            });
+            backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        });
+    </script>
+</body>
+</html>
