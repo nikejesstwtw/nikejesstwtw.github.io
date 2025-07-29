@@ -3,7 +3,7 @@ backend:
   repo: nikejesstwtw/nikejesstwtw.github.io # 請確認這裡的帳號和倉庫名稱與您的一致
   branch: main # 主要分支名稱
   auth_type: "implicit"
-  app_id: "YOUR_APP_ID" # 請貼上您在步驟三從 GitHub 取得的 Client ID
+  app_id: "Ov23liZ9mXivSY1ktVjV" # 請貼上您在步驟三從 GitHub 取得的 Client ID
 
 media_folder: "assets/uploads" # 上傳的圖片會儲存在這裡
 public_folder: "/assets/uploads" # 網站讀取圖片的路徑
