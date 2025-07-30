@@ -11,8 +11,10 @@
         name: "github",
         repo: "nikejesstwtw/nikejesstwtw.github.io", // Your GitHub repo
         branch: "main", // The branch to update
-        // Using the new, official Decap CMS public OAuth gateway.
-        base_url: "https://decap-cms-oauth-provider.netlify.app"
+        // Using PKCE auth flow directly with your own GitHub OAuth App.
+        // This is the most robust method and does not rely on any external auth provider.
+        auth_type: "pkce", 
+        app_id: "0v23li29mXIVSvlKtVjV" // Your GitHub OAuth App Client ID
       },
       // The media folder and public folder are relative to the root of the repository
       media_folder: "assets/uploads",
