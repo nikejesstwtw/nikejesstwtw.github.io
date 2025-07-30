@@ -4,43 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>內容管理後台</title>
-  <script>
-    // Define the configuration as a global variable before the CMS script loads.
-    window.CMS_CONFIG = {
-      backend: {
-        name: "github",
-        repo: "nikejesstwtw/nikejesstwtw.github.io", // Your GitHub repo
-        branch: "main", // The branch to update
-        // Using PKCE auth flow directly with your own GitHub OAuth App.
-        // This is the most robust method and does not rely on any external auth provider.
-        auth_type: "pkce", 
-        app_id: "0v23li29mXIVSvlKtVjV" // Your GitHub OAuth App Client ID
-      },
-      // The media folder and public folder are relative to the root of the repository
-      media_folder: "assets/uploads",
-      public_folder: "/assets/uploads",
-      // This is where the blog posts will be stored
-      collections: [
-        {
-          name: "posts",
-          label: "文章",
-          folder: "_posts",
-          create: true,
-          slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
-          fields: [
-            { label: "標題", name: "title", widget: "string" },
-            { label: "發佈日期", name: "date", widget: "datetime" },
-            { label: "分類", name: "category", widget: "select", options: ["好物推薦", "育兒生活", "生活隨筆"] },
-            { label: "特色圖片", name: "thumbnail", widget: "image", required: false },
-            { label: "內文", name: "body", widget: "markdown" }
-          ]
-        }
-      ]
-    };
-  </script>
+  <!-- This script will automatically enable Netlify Identity to handle login -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <!-- Decap CMS Core script. It will automatically find and use the global CMS_CONFIG variable upon loading. -->
-  <script src="https://unpkg.com/decap-cms@3.1.2/dist/decap-cms.js"></script>
+  <!-- Decap CMS Core script -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
 </html>
